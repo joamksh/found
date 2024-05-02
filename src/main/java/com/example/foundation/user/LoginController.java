@@ -18,8 +18,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String processLogin(String username, String password, Model model) {
-        if (userService.authenticate(username, password)) {
+    public String processLogin(String userId, String password, Model model) {
+        if (userService.authenticate(userId, password)) {
             // 로그인 성공 시
             return "redirect:/home";
         } else {

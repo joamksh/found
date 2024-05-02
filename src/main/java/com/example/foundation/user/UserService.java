@@ -8,8 +8,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public boolean authenticate(String username, String password) {
-        User user = userRepository.findByUsername(username);
+    public boolean authenticate(String userId, String password) {
+        User user = userRepository.findByUserId(userId);
         return user != null && user.getPassword().equals(password);
     }
 }
