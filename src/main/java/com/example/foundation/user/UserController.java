@@ -1,31 +1,43 @@
 package com.example.foundation.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/signup")
-    public String showSignupForm(Model model) {
-        model.addAttribute("user", new User());
-        return "signup";
-    }
+    @Autowired
+    private UserService userService;
 
-    @PostMapping("/signup")
-    public String processSignup(User user) {
+    @PostMapping("post/signup")
+    public ResponseEntity<String> processSignup(@RequestBody User user) {
         // 사용자 정보 저장
         userRepository.save(user);
-        return "redirect:/signup-success";
+        return new ResponseEntity<>("User signed up successfully", HttpStatus.CREATED);
     }
 
-    @GetMapping("/signup-success")
-    public String showSignupSuccessPage() {
-        return "signup-success";
+    @PostMapping("post/login")
+    public ResponseEntity<String> processLogin(@RequestBody User user) {
+        if (userService.authenticate(user.getUserId(), user.getPassword())) {
+            // 로그인 성공 시
+            return new ResponseEntity<>("Login successful", HttpStatus.OK);
+        } else {
+            // 로그인 실패 시
+            return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if(user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
